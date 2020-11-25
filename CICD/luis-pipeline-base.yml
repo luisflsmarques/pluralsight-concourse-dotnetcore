@@ -1,0 +1,102 @@
+---
+resources:
+- name: source-code
+  type: git
+  source:
+    uri: https://github.com/luisflsmarques/pluralsight-concourse-dotnetcore.git
+    branch: master
+- name: artifact-repository
+  type: s3
+  source:
+    bucket: pluralsight-concourse
+    region_name: eu-west-2
+    access_key_id: ((key-id)) # variable can be passed via command line using the -v key-id=
+    secret_access_key: ((access-key))
+    versioned_file: app.tar.gz
+
+jobs:
+    - name: unit-test
+      plan:
+      - get: source-code
+        trigger: true
+      - task: run-tests
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: mcr.microsoft.com/dotnet/core/sdk
+              tag: 2.2
+          inputs:
+          - name: source-code
+          outputs:
+          - name: test-results
+          run:
+            path: sh
+            args:
+            - -exec
+            - dotnet test ./source-code/pluralsight-concourse-dotnetcore.csproj --logger "trx" --results-directory ../test-results
+      - task: review-results
+        config:
+            platform: linux
+            image_resource:
+                type: docker-image
+                source: {repository: ubuntu}
+            inputs:
+            - name: test-results # this tasks's input matches the name of the previous step's (task) output
+            run:
+                path: find
+                args: [.]
+    - name: package-app   
+      plan:
+      - get: source-code
+        passed: [unit-test] # this means this job is sequentially run after the unit test job. Without this passed attribute, the job would run in parallel - vertically stacked.
+        trigger: true # this makes it run automatically as soon as the previous one finishes.
+      - task: publish-code
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: 
+              repository: mcr.microsoft.com/dotnet/core/sdk
+              tag: 2.2
+          inputs:
+          - name: source-code
+          outputs:
+          - name: compiled-app
+          - name: packaged-core-app
+          run:
+              path: sh
+              args:
+              - -exec
+              - chmod +x ./CI/scripts/package.sh && ./CI/scripts/package.sh
+                
+      - put: artifact-repository
+        params:
+          file: packaged-core-app/app.tar.gz
+    - name: deploy-app
+      plan:
+      - get: artifact-repository
+        passed: [package-app]
+        trigger: true
+      - task: unpack-code
+        config:
+            platform: linux
+            image_resource:
+              type: docker-image
+              source: {repository: ubuntu}
+            inputs:
+            - name: artifact-repository # this is the way to pass state from one job to the next.
+            outputs:
+            - name: extracted-package
+            run:
+                path: sh
+                args: 
+                  - -exec
+                  - |
+                    tar -xzvf ./artifact-repository/app.tar.gz -C ./extracted-package
+                    find .
+# fly -t ps set-pipeline -c mod3-pipeline-1.yml -p mod3-pipeline-1 -v key-id=AKIAVWIBKIEZ5FMV2FMD -v access-key=a4cYtw9KgR2FvOHjagfupEctiPL6RwLZKol6KxVD
+# fly -t ps set-pipeline -c luis-pipeline-base.yml -p luis-pipeline-base --load-vars-from ./CI/vars/creds.yml
+# fly -t ps trigger-job --job mod3-pipeline-1/unit-test
+# 
