@@ -9,7 +9,7 @@ nupkg/
 .vscode
 
 # remove credentials for concourse
-CICD/vars/creds.yml
+CICD/CI/vars/creds.yml
 
 # Rider
 .idea
