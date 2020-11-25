@@ -78,6 +78,9 @@ jobs:
       - get: artifact-repository
         passed: [package-app]
         trigger: true
+      - get: source-code
+        passed: [package-app]
+        trigger: true
       - task: unpack-code
         config:
             platform: linux
@@ -86,6 +89,7 @@ jobs:
               source: {repository: ubuntu}
             inputs:
             - name: artifact-repository # this is the way to pass state from one job to the next.
+            - name: source-code
             outputs:
             - name: extracted-package
             run:
