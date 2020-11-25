@@ -70,7 +70,6 @@ jobs:
               args:
               - -exec
               - chmod +x ./source-code/CICD/CI/scripts/package.sh && ./source-code/CICD/CI/scripts/package.sh
-                
       - put: artifact-repository
         params:
           file: packaged-core-app/app.tar.gz
@@ -93,9 +92,8 @@ jobs:
                 path: sh
                 args: 
                   - -exec
-                  - |
-                    tar -xzvf ./artifact-repository/app.tar.gz -C ./extracted-package
-                    find .
+                  - chmod +x ./source-code/CICD/CI/scripts/unpackage.sh && ./source-code/CICD/CI/scripts/unpackage.sh
+                    
 # fly -t ps set-pipeline -c mod3-pipeline-1.yml -p mod3-pipeline-1 -v key-id=AKIAVWIBKIEZ5FMV2FMD -v access-key=a4cYtw9KgR2FvOHjagfupEctiPL6RwLZKol6KxVD
 # fly -t ps set-pipeline -c luis-pipeline-base.yml -p luis-pipeline-base --load-vars-from ./CI/vars/creds.yml
 # fly -t ps trigger-job --job mod3-pipeline-1/unit-test
