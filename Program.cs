@@ -12,7 +12,7 @@ namespace pluralsight_concourse_dotnetcore
 {
     public class Program
     {
-        private int deleteMe=0;
+        private static int deleteMe=0;
 
         public static void Main(string[] args)
         {
