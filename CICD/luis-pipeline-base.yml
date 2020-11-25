@@ -41,7 +41,10 @@ jobs:
             platform: linux
             image_resource:
                 type: docker-image
-                source: {repository: ubuntu}
+                source:
+                  username: ((docker_user))
+                  password: ((docker_pass))
+                  repository: ubuntu
             inputs:
             - name: test-results # this tasks's input matches the name of the previous step's (task) output
             run:
@@ -86,7 +89,10 @@ jobs:
             platform: linux
             image_resource:
               type: docker-image
-              source: {repository: ubuntu}
+              source:
+                  username: ((docker_user))
+                  password: ((docker_pass))
+                  repository: ubuntu
             inputs:
             - name: artifact-repository # this is the way to pass state from one job to the next.
             - name: source-code
