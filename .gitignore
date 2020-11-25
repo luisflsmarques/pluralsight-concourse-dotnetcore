@@ -8,6 +8,9 @@ nupkg/
 # Visual Studio Code
 .vscode
 
+# remove credentials for concourse
+CICD/vars/creds.yml
+
 # Rider
 .idea
 
