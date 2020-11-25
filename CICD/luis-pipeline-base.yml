@@ -107,4 +107,4 @@ jobs:
 # fly -t ps set-pipeline -c mod3-pipeline-1.yml -p mod3-pipeline-1 -v key-id=AKIAVWIBKIEZ5FMV2FMD -v access-key=a4cYtw9KgR2FvOHjagfupEctiPL6RwLZKol6KxVD
 # fly -t ps set-pipeline -c luis-pipeline-base.yml -p luis-pipeline-base --load-vars-from ./CI/vars/creds.yml
 # fly -t ps trigger-job --job mod3-pipeline-1/unit-test
-# 
+# fly -t refi set-pipeline -c luis-pipeline-base.yml -p luis-pipeline-base --load-vars-from ./CI/vars/creds.yml
