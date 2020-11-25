@@ -69,7 +69,7 @@ jobs:
               path: sh
               args:
               - -exec
-              - chmod +x ./CI/scripts/package.sh && ./CI/scripts/package.sh
+              - chmod +x ./CICD/CI/scripts/package.sh && ./CICD/CI/scripts/package.sh
                 
       - put: artifact-repository
         params:
